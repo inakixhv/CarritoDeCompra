@@ -48,6 +48,19 @@ function mostrarcarrito(carrito) {
     }
 
 }
+let listaArticulos = document.getElementById("listaArticulos");
+
+function mostrarListaArticulos() {
+    listaArticulos.innerHTML = "";
+    for (let i = 0; i < listaProductos.length; i++) {
+        listaArticulos.innerHTML += `<li>${listaProductos[i].nombre} $${listaProductos[i].precio}</li>`
+    }
+}
+
+
+
+
+
 
 
 let listaProductos = [
@@ -57,6 +70,7 @@ let listaProductos = [
     new Producto("Manteca", 300),
     new Producto("Queso", 700)
 ]
+mostrarListaArticulos();
 // console.log(listaProductos[1].precio);
 
 let carrito = new Carrito();
@@ -66,8 +80,8 @@ let botonAgregar = document.getElementById("agregarProductos");
 let botonFinalizar = document.getElementById("finalizarCompra");
 let totalCarrito = document.getElementById("totalCarrito");
 let montoTotal = document.getElementById("montoTotal");
-botonAgregar.addEventListener("click", () => {
-    let ciclo = true;
+botonAgregar.addEventListener("click",function clickBotonAgregar () {
+    // let ciclo = true;
     // while(ciclo){
     // console.log("entro al ciclo");
 
@@ -123,6 +137,16 @@ botonAgregar.addEventListener("click", () => {
                     }
                     mostrarcarrito(carrito);
                     console.log(carrito.productos);
+                    Swal.fire({
+                        title:"Desea agregar otro producto?",
+                        showConfirmButton: true,
+                        confirmButtonText: "Si",
+                        showCancelButton: true,
+                        cancelButtonText: "No"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            clickBotonAgregar();
+                    }})
                 }
 
             });
@@ -131,7 +155,7 @@ botonAgregar.addEventListener("click", () => {
         } else {
             console.log("se cancelo");
 
-            ciclo = false
+            // ciclo = false
         }
     })
 });
@@ -148,4 +172,49 @@ botonFinalizar.addEventListener("click", () => {
     )
     totalCarrito.style.display = "flex";
     
+});
+
+
+let botonDesc = document.getElementById("botonDesc");
+botonDesc.addEventListener("click", function(){
+    // totalCarrito.style.display = "none";
+    Swal.fire({
+        title: 'ID producto a aplicar Descuento',
+        input: 'number',
+        inputAttributes: {
+            min: 1,
+            max: 5
+        }
+
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let id = result.value - 1;
+
+            Swal.fire({
+                title: `Cuanto descuento desea aplicarle a: ${listaProductos[id].nombre}?`,
+                input: 'number',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let desc = 1-( Number(result.value )/100);
+                    console.log(desc);
+                    listaProductos[id].precio = listaProductos[id].precio * desc;
+                    console.log(listaProductos);
+                    
+                    // carrito.productos[id].descuento = desc;
+                    carrito.productos.forEach((producto) => {
+                        console.log(producto);
+                        
+                        if(producto.nombre == listaProductos[id].nombre){
+                            producto.precio =   listaProductos[id].precio;
+                            
+                        }
+                    })
+                    mostrarListaArticulos() ;
+                    mostrarcarrito(carrito);
+                    total();
+                }
+            })
+        }
+
+    })
 });
